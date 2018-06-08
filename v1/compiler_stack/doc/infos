@@ -1,0 +1,17 @@
+lexer:
+http://www-cs-students.stanford.edu/~blynn//nex/
+parser:
+https://godoc.org/golang.org/x/tools/cmd/goyacc
+
+STACKVM:
+Beim Start des Programms werden alle Konstanten/Literale (gespeichert am Anfang des Bytecodes) geladen.
+Die sind einfach alle hintereinander ohne irgendwelche delimiter oder so.
+
+Am Stack liegen nur int-werte
+
+Ladebefehle (schieben sachen auf den stack).
+
+push <int> - schreibt int wert am stack
+store <varname> - schreibt variable in das aktuelle dictionary (kommt am scope an)
+load <varname> - holts wieder am stack
+echo <gibt ding vom stack aus>

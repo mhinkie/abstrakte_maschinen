@@ -1,0 +1,1510 @@
+
+state 0
+	$accept: .program $end 
+
+	K_PROG_START  shift 2
+	.  error
+
+	program  goto 1
+
+state 1
+	$accept:  program.$end 
+
+	$end  accept
+	.  error
+
+
+state 2
+	program:  K_PROG_START.statements K_PROG_END 
+	statements: .    (2)
+
+	.  reduce 2 (src line 31)
+
+	statements  goto 3
+
+state 3
+	program:  K_PROG_START statements.K_PROG_END 
+	statements:  statements.statement C_SEMIK 
+	statements:  statements.blockstatement 
+	statement: .    (9)
+
+	K_PROG_END  shift 4
+	K_IF  shift 16
+	K_FUNC  shift 20
+	K_FOREACH  shift 26
+	K_FOR  shift 24
+	K_WHILE  shift 25
+	K_ECHO  shift 7
+	K_RETURN  shift 8
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	.  reduce 9 (src line 50)
+
+	statement  goto 5
+	varaccess  goto 14
+	varassign  goto 9
+	blockstatement  goto 6
+	conditional  goto 11
+	loop  goto 12
+	whileloop  goto 18
+	forloop  goto 17
+	foreachloop  goto 19
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 10
+	idfunc  goto 15
+	funcdec  goto 13
+
+state 4
+	program:  K_PROG_START statements K_PROG_END.    (1)
+
+	.  reduce 1 (src line 23)
+
+
+state 5
+	statements:  statements statement.C_SEMIK 
+
+	C_SEMIK  shift 28
+	.  error
+
+
+state 6
+	statements:  statements blockstatement.    (4)
+
+	.  reduce 4 (src line 36)
+
+
+state 7
+	statement:  K_ECHO.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 29
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 8
+	statement:  K_RETURN.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 37
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 9
+	statement:  varassign.    (7)
+
+	.  reduce 7 (src line 46)
+
+
+state 10
+	statement:  funccall.    (8)
+
+	.  reduce 8 (src line 48)
+
+
+state 11
+	blockstatement:  conditional.    (10)
+
+	.  reduce 10 (src line 56)
+
+
+state 12
+	blockstatement:  loop.    (11)
+
+	.  reduce 11 (src line 58)
+
+
+state 13
+	blockstatement:  funcdec.    (12)
+
+	.  reduce 12 (src line 60)
+
+
+state 14
+	varassign:  varaccess.C_ASSIGN expr 
+	varassign:  varaccess.unaryop 
+	arrayaccess:  varaccess.C_BRAK_L expr C_BRAK_R 
+
+	C_ASSIGN  shift 38
+	C_INC  shift 41
+	C_DEC  shift 42
+	C_BRAK_L  shift 40
+	.  error
+
+	unaryop  goto 39
+
+state 15
+	funccall:  idfunc.C_PARA_L arglist C_PARA_R 
+
+	C_PARA_L  shift 43
+	.  error
+
+
+state 16
+	conditional:  K_IF.C_PARA_L expr C_PARA_R block elseblock 
+
+	C_PARA_L  shift 44
+	.  error
+
+
+state 17
+	loop:  forloop.    (16)
+
+	.  reduce 16 (src line 85)
+
+
+state 18
+	loop:  whileloop.    (17)
+
+	.  reduce 17 (src line 87)
+
+
+state 19
+	loop:  foreachloop.    (18)
+
+	.  reduce 18 (src line 89)
+
+
+state 20
+	funcdec:  K_FUNC.idfunc C_PARA_L varlist C_PARA_R block 
+
+	IDFUNC  shift 23
+	.  error
+
+	idfunc  goto 45
+
+state 21
+	varaccess:  singvar.    (56)
+
+	.  reduce 56 (src line 246)
+
+
+state 22
+	varaccess:  arrayaccess.    (57)
+
+	.  reduce 57 (src line 250)
+
+
+state 23
+	idfunc:  IDFUNC.    (14)
+
+	.  reduce 14 (src line 73)
+
+
+state 24
+	forloop:  K_FOR.C_PARA_L cvarassign C_SEMIK expr C_SEMIK cvarassign C_PARA_R block 
+
+	C_PARA_L  shift 46
+	.  error
+
+
+state 25
+	whileloop:  K_WHILE.C_PARA_L expr C_PARA_R block 
+
+	C_PARA_L  shift 47
+	.  error
+
+
+state 26
+	foreachloop:  K_FOREACH.C_PARA_L singvar K_AS singvar C_PARA_R block 
+
+	C_PARA_L  shift 48
+	.  error
+
+
+state 27
+	singvar:  IDVAR.    (58)
+
+	.  reduce 58 (src line 256)
+
+
+state 28
+	statements:  statements statement C_SEMIK.    (3)
+
+	.  reduce 3 (src line 32)
+
+
+state 29
+	statement:  K_ECHO expr.    (5)
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 5 (src line 42)
+
+
+state 30
+	expr:  C_PARA_L.expr C_PARA_R 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 58
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 31
+	expr:  varaccess.    (27)
+	arrayaccess:  varaccess.C_BRAK_L expr C_BRAK_R 
+
+	C_BRAK_L  shift 40
+	.  reduce 27 (src line 135)
+
+
+state 32
+	expr:  INT.    (28)
+
+	.  reduce 28 (src line 139)
+
+
+state 33
+	expr:  STRING.    (29)
+
+	.  reduce 29 (src line 141)
+
+
+state 34
+	expr:  K_ARRAY.C_PARA_L arglist C_PARA_R 
+
+	C_PARA_L  shift 59
+	.  error
+
+
+state 35
+	expr:  binop.    (31)
+
+	.  reduce 31 (src line 145)
+
+
+state 36
+	expr:  funccall.    (32)
+
+	.  reduce 32 (src line 147)
+
+
+state 37
+	statement:  K_RETURN expr.    (6)
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 6 (src line 44)
+
+
+state 38
+	varassign:  varaccess C_ASSIGN.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 60
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 39
+	varassign:  varaccess unaryop.    (53)
+
+	.  reduce 53 (src line 226)
+
+
+state 40
+	arrayaccess:  varaccess C_BRAK_L.expr C_BRAK_R 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 61
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 41
+	unaryop:  C_INC.    (54)
+
+	.  reduce 54 (src line 236)
+
+
+state 42
+	unaryop:  C_DEC.    (55)
+
+	.  reduce 55 (src line 240)
+
+
+state 43
+	funccall:  idfunc C_PARA_L.arglist C_PARA_R 
+	arglist: .    (33)
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  reduce 33 (src line 151)
+
+	arglist  goto 62
+	nearglist  goto 63
+	expr  goto 64
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 44
+	conditional:  K_IF C_PARA_L.expr C_PARA_R block elseblock 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 65
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 45
+	funcdec:  K_FUNC idfunc.C_PARA_L varlist C_PARA_R block 
+
+	C_PARA_L  shift 66
+	.  error
+
+
+state 46
+	forloop:  K_FOR C_PARA_L.cvarassign C_SEMIK expr C_SEMIK cvarassign C_PARA_R block 
+	cvarassign: .    (50)
+
+	IDVAR  shift 27
+	.  reduce 50 (src line 215)
+
+	varaccess  goto 14
+	varassign  goto 68
+	cvarassign  goto 67
+	singvar  goto 21
+	arrayaccess  goto 22
+
+state 47
+	whileloop:  K_WHILE C_PARA_L.expr C_PARA_R block 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 69
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 48
+	foreachloop:  K_FOREACH C_PARA_L.singvar K_AS singvar C_PARA_R block 
+
+	IDVAR  shift 27
+	.  error
+
+	singvar  goto 70
+
+state 49
+	binop:  expr C_GT.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 71
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 50
+	binop:  expr C_LT.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 72
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 51
+	binop:  expr C_NEQ.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 73
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 52
+	binop:  expr C_EQ.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 74
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 53
+	binop:  expr C_CONCAT.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 75
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 54
+	binop:  expr C_PLUS.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 76
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 55
+	binop:  expr C_MINUS.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 77
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 56
+	binop:  expr C_AST.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 78
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 57
+	binop:  expr C_DIV.expr 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 79
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 58
+	expr:  C_PARA_L expr.C_PARA_R 
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_PARA_R  shift 80
+	C_DIV  shift 57
+	.  error
+
+
+state 59
+	expr:  K_ARRAY C_PARA_L.arglist C_PARA_R 
+	arglist: .    (33)
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  reduce 33 (src line 151)
+
+	arglist  goto 81
+	nearglist  goto 63
+	expr  goto 64
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 60
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+	varassign:  varaccess C_ASSIGN expr.    (52)
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 52 (src line 224)
+
+
+state 61
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+	arrayaccess:  varaccess C_BRAK_L expr.C_BRAK_R 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_BRAK_R  shift 82
+	C_DIV  shift 57
+	.  error
+
+
+state 62
+	funccall:  idfunc C_PARA_L arglist.C_PARA_R 
+
+	C_PARA_R  shift 83
+	.  error
+
+
+state 63
+	arglist:  nearglist.    (34)
+
+	.  reduce 34 (src line 152)
+
+
+state 64
+	nearglist:  expr.    (35)
+	nearglist:  expr.C_COMMA arglist 
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	C_COMMA  shift 84
+	.  reduce 35 (src line 156)
+
+
+state 65
+	conditional:  K_IF C_PARA_L expr.C_PARA_R block elseblock 
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_PARA_R  shift 85
+	C_DIV  shift 57
+	.  error
+
+
+state 66
+	funcdec:  K_FUNC idfunc C_PARA_L.varlist C_PARA_R block 
+	varlist: .    (37)
+
+	IDVAR  shift 27
+	.  reduce 37 (src line 166)
+
+	varlist  goto 86
+	nevarlist  goto 87
+	singvar  goto 88
+
+state 67
+	forloop:  K_FOR C_PARA_L cvarassign.C_SEMIK expr C_SEMIK cvarassign C_PARA_R block 
+
+	C_SEMIK  shift 89
+	.  error
+
+
+state 68
+	cvarassign:  varassign.    (51)
+
+	.  reduce 51 (src line 218)
+
+
+state 69
+	whileloop:  K_WHILE C_PARA_L expr.C_PARA_R block 
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_PARA_R  shift 90
+	C_DIV  shift 57
+	.  error
+
+
+state 70
+	foreachloop:  K_FOREACH C_PARA_L singvar.K_AS singvar C_PARA_R block 
+
+	K_AS  shift 91
+	.  error
+
+
+71: shift/reduce conflict (shift 49(0), red'n 41(0)) on C_GT
+71: shift/reduce conflict (shift 50(0), red'n 41(0)) on C_LT
+71: shift/reduce conflict (shift 52(0), red'n 41(0)) on C_EQ
+71: shift/reduce conflict (shift 51(0), red'n 41(0)) on C_NEQ
+71: shift/reduce conflict (shift 53(0), red'n 41(0)) on C_CONCAT
+71: shift/reduce conflict (shift 54(0), red'n 41(0)) on C_PLUS
+71: shift/reduce conflict (shift 55(0), red'n 41(0)) on C_MINUS
+71: shift/reduce conflict (shift 56(0), red'n 41(0)) on C_AST
+71: shift/reduce conflict (shift 57(0), red'n 41(0)) on C_DIV
+state 71
+	binop:  expr.C_GT expr 
+	binop:  expr C_GT expr.    (41)
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 41 (src line 177)
+
+
+72: shift/reduce conflict (shift 49(0), red'n 42(0)) on C_GT
+72: shift/reduce conflict (shift 50(0), red'n 42(0)) on C_LT
+72: shift/reduce conflict (shift 52(0), red'n 42(0)) on C_EQ
+72: shift/reduce conflict (shift 51(0), red'n 42(0)) on C_NEQ
+72: shift/reduce conflict (shift 53(0), red'n 42(0)) on C_CONCAT
+72: shift/reduce conflict (shift 54(0), red'n 42(0)) on C_PLUS
+72: shift/reduce conflict (shift 55(0), red'n 42(0)) on C_MINUS
+72: shift/reduce conflict (shift 56(0), red'n 42(0)) on C_AST
+72: shift/reduce conflict (shift 57(0), red'n 42(0)) on C_DIV
+state 72
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr C_LT expr.    (42)
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 42 (src line 181)
+
+
+73: shift/reduce conflict (shift 49(0), red'n 43(0)) on C_GT
+73: shift/reduce conflict (shift 50(0), red'n 43(0)) on C_LT
+73: shift/reduce conflict (shift 52(0), red'n 43(0)) on C_EQ
+73: shift/reduce conflict (shift 51(0), red'n 43(0)) on C_NEQ
+73: shift/reduce conflict (shift 53(0), red'n 43(0)) on C_CONCAT
+73: shift/reduce conflict (shift 54(0), red'n 43(0)) on C_PLUS
+73: shift/reduce conflict (shift 55(0), red'n 43(0)) on C_MINUS
+73: shift/reduce conflict (shift 56(0), red'n 43(0)) on C_AST
+73: shift/reduce conflict (shift 57(0), red'n 43(0)) on C_DIV
+state 73
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr C_NEQ expr.    (43)
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 43 (src line 185)
+
+
+74: shift/reduce conflict (shift 49(0), red'n 44(0)) on C_GT
+74: shift/reduce conflict (shift 50(0), red'n 44(0)) on C_LT
+74: shift/reduce conflict (shift 52(0), red'n 44(0)) on C_EQ
+74: shift/reduce conflict (shift 51(0), red'n 44(0)) on C_NEQ
+74: shift/reduce conflict (shift 53(0), red'n 44(0)) on C_CONCAT
+74: shift/reduce conflict (shift 54(0), red'n 44(0)) on C_PLUS
+74: shift/reduce conflict (shift 55(0), red'n 44(0)) on C_MINUS
+74: shift/reduce conflict (shift 56(0), red'n 44(0)) on C_AST
+74: shift/reduce conflict (shift 57(0), red'n 44(0)) on C_DIV
+state 74
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr C_EQ expr.    (44)
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 44 (src line 189)
+
+
+75: shift/reduce conflict (shift 49(0), red'n 45(0)) on C_GT
+75: shift/reduce conflict (shift 50(0), red'n 45(0)) on C_LT
+75: shift/reduce conflict (shift 52(0), red'n 45(0)) on C_EQ
+75: shift/reduce conflict (shift 51(0), red'n 45(0)) on C_NEQ
+75: shift/reduce conflict (shift 53(0), red'n 45(0)) on C_CONCAT
+75: shift/reduce conflict (shift 54(0), red'n 45(0)) on C_PLUS
+75: shift/reduce conflict (shift 55(0), red'n 45(0)) on C_MINUS
+75: shift/reduce conflict (shift 56(0), red'n 45(0)) on C_AST
+75: shift/reduce conflict (shift 57(0), red'n 45(0)) on C_DIV
+state 75
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr C_CONCAT expr.    (45)
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 45 (src line 193)
+
+
+76: shift/reduce conflict (shift 49(0), red'n 46(0)) on C_GT
+76: shift/reduce conflict (shift 50(0), red'n 46(0)) on C_LT
+76: shift/reduce conflict (shift 52(0), red'n 46(0)) on C_EQ
+76: shift/reduce conflict (shift 51(0), red'n 46(0)) on C_NEQ
+76: shift/reduce conflict (shift 53(0), red'n 46(0)) on C_CONCAT
+76: shift/reduce conflict (shift 54(0), red'n 46(0)) on C_PLUS
+76: shift/reduce conflict (shift 55(0), red'n 46(0)) on C_MINUS
+76: shift/reduce conflict (shift 56(0), red'n 46(0)) on C_AST
+76: shift/reduce conflict (shift 57(0), red'n 46(0)) on C_DIV
+state 76
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr C_PLUS expr.    (46)
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 46 (src line 197)
+
+
+77: shift/reduce conflict (shift 49(0), red'n 47(0)) on C_GT
+77: shift/reduce conflict (shift 50(0), red'n 47(0)) on C_LT
+77: shift/reduce conflict (shift 52(0), red'n 47(0)) on C_EQ
+77: shift/reduce conflict (shift 51(0), red'n 47(0)) on C_NEQ
+77: shift/reduce conflict (shift 53(0), red'n 47(0)) on C_CONCAT
+77: shift/reduce conflict (shift 54(0), red'n 47(0)) on C_PLUS
+77: shift/reduce conflict (shift 55(0), red'n 47(0)) on C_MINUS
+77: shift/reduce conflict (shift 56(0), red'n 47(0)) on C_AST
+77: shift/reduce conflict (shift 57(0), red'n 47(0)) on C_DIV
+state 77
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr C_MINUS expr.    (47)
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 47 (src line 201)
+
+
+78: shift/reduce conflict (shift 49(0), red'n 48(0)) on C_GT
+78: shift/reduce conflict (shift 50(0), red'n 48(0)) on C_LT
+78: shift/reduce conflict (shift 52(0), red'n 48(0)) on C_EQ
+78: shift/reduce conflict (shift 51(0), red'n 48(0)) on C_NEQ
+78: shift/reduce conflict (shift 53(0), red'n 48(0)) on C_CONCAT
+78: shift/reduce conflict (shift 54(0), red'n 48(0)) on C_PLUS
+78: shift/reduce conflict (shift 55(0), red'n 48(0)) on C_MINUS
+78: shift/reduce conflict (shift 56(0), red'n 48(0)) on C_AST
+78: shift/reduce conflict (shift 57(0), red'n 48(0)) on C_DIV
+state 78
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr C_AST expr.    (48)
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 48 (src line 205)
+
+
+79: shift/reduce conflict (shift 49(0), red'n 49(0)) on C_GT
+79: shift/reduce conflict (shift 50(0), red'n 49(0)) on C_LT
+79: shift/reduce conflict (shift 52(0), red'n 49(0)) on C_EQ
+79: shift/reduce conflict (shift 51(0), red'n 49(0)) on C_NEQ
+79: shift/reduce conflict (shift 53(0), red'n 49(0)) on C_CONCAT
+79: shift/reduce conflict (shift 54(0), red'n 49(0)) on C_PLUS
+79: shift/reduce conflict (shift 55(0), red'n 49(0)) on C_MINUS
+79: shift/reduce conflict (shift 56(0), red'n 49(0)) on C_AST
+79: shift/reduce conflict (shift 57(0), red'n 49(0)) on C_DIV
+state 79
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+	binop:  expr C_DIV expr.    (49)
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	.  reduce 49 (src line 209)
+
+
+state 80
+	expr:  C_PARA_L expr C_PARA_R.    (26)
+
+	.  reduce 26 (src line 131)
+
+
+state 81
+	expr:  K_ARRAY C_PARA_L arglist.C_PARA_R 
+
+	C_PARA_R  shift 92
+	.  error
+
+
+state 82
+	arrayaccess:  varaccess C_BRAK_L expr C_BRAK_R.    (59)
+
+	.  reduce 59 (src line 262)
+
+
+state 83
+	funccall:  idfunc C_PARA_L arglist C_PARA_R.    (15)
+
+	.  reduce 15 (src line 79)
+
+
+state 84
+	nearglist:  expr C_COMMA.arglist 
+	arglist: .    (33)
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  reduce 33 (src line 151)
+
+	arglist  goto 93
+	nearglist  goto 63
+	expr  goto 64
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 85
+	conditional:  K_IF C_PARA_L expr C_PARA_R.block elseblock 
+
+	C_CURL_L  shift 95
+	.  error
+
+	block  goto 94
+
+state 86
+	funcdec:  K_FUNC idfunc C_PARA_L varlist.C_PARA_R block 
+
+	C_PARA_R  shift 96
+	.  error
+
+
+state 87
+	varlist:  nevarlist.    (38)
+
+	.  reduce 38 (src line 167)
+
+
+state 88
+	nevarlist:  singvar.    (39)
+	nevarlist:  singvar.C_COMMA varlist 
+
+	C_COMMA  shift 97
+	.  reduce 39 (src line 171)
+
+
+state 89
+	forloop:  K_FOR C_PARA_L cvarassign C_SEMIK.expr C_SEMIK cvarassign C_PARA_R block 
+
+	K_ARRAY  shift 34
+	INT  shift 32
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_PARA_L  shift 30
+	STRING  shift 33
+	.  error
+
+	expr  goto 98
+	varaccess  goto 31
+	binop  goto 35
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 36
+	idfunc  goto 15
+
+state 90
+	whileloop:  K_WHILE C_PARA_L expr C_PARA_R.block 
+
+	C_CURL_L  shift 95
+	.  error
+
+	block  goto 99
+
+state 91
+	foreachloop:  K_FOREACH C_PARA_L singvar K_AS.singvar C_PARA_R block 
+
+	IDVAR  shift 27
+	.  error
+
+	singvar  goto 100
+
+state 92
+	expr:  K_ARRAY C_PARA_L arglist C_PARA_R.    (30)
+
+	.  reduce 30 (src line 143)
+
+
+state 93
+	nearglist:  expr C_COMMA arglist.    (36)
+
+	.  reduce 36 (src line 160)
+
+
+state 94
+	conditional:  K_IF C_PARA_L expr C_PARA_R block.elseblock 
+	elseblock: .    (24)
+
+	K_ELSE  shift 102
+	.  reduce 24 (src line 126)
+
+	elseblock  goto 101
+
+state 95
+	block:  C_CURL_L.statements C_CURL_R 
+	statements: .    (2)
+
+	.  reduce 2 (src line 31)
+
+	statements  goto 103
+
+state 96
+	funcdec:  K_FUNC idfunc C_PARA_L varlist C_PARA_R.block 
+
+	C_CURL_L  shift 95
+	.  error
+
+	block  goto 104
+
+state 97
+	nevarlist:  singvar C_COMMA.varlist 
+	varlist: .    (37)
+
+	IDVAR  shift 27
+	.  reduce 37 (src line 166)
+
+	varlist  goto 105
+	nevarlist  goto 87
+	singvar  goto 88
+
+state 98
+	forloop:  K_FOR C_PARA_L cvarassign C_SEMIK expr.C_SEMIK cvarassign C_PARA_R block 
+	binop:  expr.C_GT expr 
+	binop:  expr.C_LT expr 
+	binop:  expr.C_NEQ expr 
+	binop:  expr.C_EQ expr 
+	binop:  expr.C_CONCAT expr 
+	binop:  expr.C_PLUS expr 
+	binop:  expr.C_MINUS expr 
+	binop:  expr.C_AST expr 
+	binop:  expr.C_DIV expr 
+
+	C_GT  shift 49
+	C_LT  shift 50
+	C_EQ  shift 52
+	C_NEQ  shift 51
+	C_CONCAT  shift 53
+	C_PLUS  shift 54
+	C_MINUS  shift 55
+	C_AST  shift 56
+	C_DIV  shift 57
+	C_SEMIK  shift 106
+	.  error
+
+
+state 99
+	whileloop:  K_WHILE C_PARA_L expr C_PARA_R block.    (20)
+
+	.  reduce 20 (src line 100)
+
+
+state 100
+	foreachloop:  K_FOREACH C_PARA_L singvar K_AS singvar.C_PARA_R block 
+
+	C_PARA_R  shift 107
+	.  error
+
+
+state 101
+	conditional:  K_IF C_PARA_L expr C_PARA_R block elseblock.    (23)
+
+	.  reduce 23 (src line 118)
+
+
+state 102
+	elseblock:  K_ELSE.block 
+
+	C_CURL_L  shift 95
+	.  error
+
+	block  goto 108
+
+state 103
+	statements:  statements.statement C_SEMIK 
+	statements:  statements.blockstatement 
+	block:  C_CURL_L statements.C_CURL_R 
+	statement: .    (9)
+
+	K_IF  shift 16
+	K_FUNC  shift 20
+	K_FOREACH  shift 26
+	K_FOR  shift 24
+	K_WHILE  shift 25
+	K_ECHO  shift 7
+	K_RETURN  shift 8
+	IDFUNC  shift 23
+	IDVAR  shift 27
+	C_CURL_R  shift 109
+	.  reduce 9 (src line 50)
+
+	statement  goto 5
+	varaccess  goto 14
+	varassign  goto 9
+	blockstatement  goto 6
+	conditional  goto 11
+	loop  goto 12
+	whileloop  goto 18
+	forloop  goto 17
+	foreachloop  goto 19
+	singvar  goto 21
+	arrayaccess  goto 22
+	funccall  goto 10
+	idfunc  goto 15
+	funcdec  goto 13
+
+state 104
+	funcdec:  K_FUNC idfunc C_PARA_L varlist C_PARA_R block.    (13)
+
+	.  reduce 13 (src line 65)
+
+
+state 105
+	nevarlist:  singvar C_COMMA varlist.    (40)
+
+	.  reduce 40 (src line 173)
+
+
+state 106
+	forloop:  K_FOR C_PARA_L cvarassign C_SEMIK expr C_SEMIK.cvarassign C_PARA_R block 
+	cvarassign: .    (50)
+
+	IDVAR  shift 27
+	.  reduce 50 (src line 215)
+
+	varaccess  goto 14
+	varassign  goto 68
+	cvarassign  goto 110
+	singvar  goto 21
+	arrayaccess  goto 22
+
+state 107
+	foreachloop:  K_FOREACH C_PARA_L singvar K_AS singvar C_PARA_R.block 
+
+	C_CURL_L  shift 95
+	.  error
+
+	block  goto 111
+
+state 108
+	elseblock:  K_ELSE block.    (25)
+
+	.  reduce 25 (src line 127)
+
+
+state 109
+	block:  C_CURL_L statements C_CURL_R.    (22)
+
+	.  reduce 22 (src line 114)
+
+
+state 110
+	forloop:  K_FOR C_PARA_L cvarassign C_SEMIK expr C_SEMIK cvarassign.C_PARA_R block 
+
+	C_PARA_R  shift 112
+	.  error
+
+
+state 111
+	foreachloop:  K_FOREACH C_PARA_L singvar K_AS singvar C_PARA_R block.    (21)
+
+	.  reduce 21 (src line 107)
+
+
+state 112
+	forloop:  K_FOR C_PARA_L cvarassign C_SEMIK expr C_SEMIK cvarassign C_PARA_R.block 
+
+	C_CURL_L  shift 95
+	.  error
+
+	block  goto 113
+
+state 113
+	forloop:  K_FOR C_PARA_L cvarassign C_SEMIK expr C_SEMIK cvarassign C_PARA_R block.    (19)
+
+	.  reduce 19 (src line 93)
+
+
+39 terminals, 27 nonterminals
+60 grammar rules, 114/8000 states
+81 shift/reduce, 0 reduce/reduce conflicts reported
+76 working sets used
+memory: parser 222/120000
+94 extra closures
+344 shift entries, 1 exceptions
+66 goto entries
+138 entries saved by goto default
+Optimizer space used: output 207/120000
+207 table entries, 20 zero
+maximum spread: 39, maximum offset: 112
