@@ -1,5 +1,5 @@
 all: interpreter.c
-		gcc -o mphp interpreter.c 
+		gcc -ggdb -o mphp interpreter.c 
 
 test: all
 	./mphp examples/prime.php.bc

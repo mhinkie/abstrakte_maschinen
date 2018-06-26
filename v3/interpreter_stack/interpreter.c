@@ -16,18 +16,23 @@ int heapEnd = 0;
 
 #define COMMANDSIZE 17
 /* Mit dispatch wird normal im code weitergegangen == cp um eins erhöht */
-#define DISPATCH() pc = pc + COMMANDSIZE; /*printf("hab ccode: %d\n", code[pc]);*/ EXECUTE()
+#define DISPATCH() pc++; /*printf("hab ccode: %d\n", code[pc]);*/ EXECUTE()
 /* Mit execute wird dann wirklich das nächste kommando aufgerufen - wenn der pc manuell geändert wird, wird nur EXECUTE verwendet */
-#define EXECUTE() debug_print("Now at position %d (%d) - command %d", (int)(pc / COMMANDSIZE), pc, code[pc]); goto *command_impl[code[pc]]
+#define EXECUTE() debug_print("Now at position %ld", (long)pc); goto **pc;
 
-#define P1() ((int64_t)code[pc + 1 + 7] << 56 | (int64_t)code[pc + 1 + 6] << 48 | (int64_t)code[pc + 1 + 5] << 40 | (int64_t)code[pc + 1 + 4] << 32 | (int64_t)code[pc + 1 + 3] << 24 | (int64_t)code[pc + 1 + 2] << 16 | (int64_t)code[pc + 1 + 1] << 8 | (int64_t)code[pc + 1 + 0])
-#define P2() ((int64_t)code[pc + 9 + 7] << 56 | (int64_t)code[pc + 9 + 6] << 48 | (int64_t)code[pc + 9 + 5] << 40 | (int64_t)code[pc + 9 + 4] << 32 | (int64_t)code[pc + 9 + 3] << 24 | (int64_t)code[pc + 9 + 2] << 16 | (int64_t)code[pc + 9 + 1] << 8 | (int64_t)code[pc + 9 + 0])
+#define CODE_POS_IN_MEMORY() ((pc - code_addresses) * COMMANDSIZE)
+#define P1() ((int64_t)code[CODE_POS_IN_MEMORY() + 1 + 7] << 56 \
+  | (int64_t)code[CODE_POS_IN_MEMORY() + 1 + 6] << 48 | (int64_t)code[CODE_POS_IN_MEMORY() + 1 + 5] << 40 \
+  | (int64_t)code[CODE_POS_IN_MEMORY() + 1 + 4] << 32 | (int64_t)code[CODE_POS_IN_MEMORY() + 1 + 3] << 24 \
+  | (int64_t)code[CODE_POS_IN_MEMORY() + 1 + 2] << 16 | (int64_t)code[CODE_POS_IN_MEMORY() + 1 + 1] << 8 \
+  | (int64_t)code[CODE_POS_IN_MEMORY() + 1 + 0])
+#define P2() ((int64_t)code[CODE_POS_IN_MEMORY() + 9 + 7] << 56 | (int64_t)code[CODE_POS_IN_MEMORY() + 9 + 6] << 48 | (int64_t)code[CODE_POS_IN_MEMORY() + 9 + 5] << 40 | (int64_t)code[CODE_POS_IN_MEMORY() + 9 + 4] << 32 | (int64_t)code[CODE_POS_IN_MEMORY() + 9 + 3] << 24 | (int64_t)code[CODE_POS_IN_MEMORY() + 9 + 2] << 16 | (int64_t)code[CODE_POS_IN_MEMORY() + 9 + 1] << 8 | (int64_t)code[CODE_POS_IN_MEMORY() + 9 + 0])
 #define INT64_AT(buffer) ((int64_t)buffer[7] << 56 | (int64_t)buffer[6] << 48 | (int64_t)buffer[5] << 40 | (int64_t)buffer[4] << 32 | (int64_t)buffer[3] << 24 | (int64_t)buffer[2] << 16 | (int64_t)buffer[1] << 8 | (int64_t)buffer[0])
 #define INT_AT(buffer) ((int)(INT64_AT(buffer)))
 
 #define RETURN(retval) free(stack); return retval;
 
-int interpret(unsigned char *code) {
+int interpret(unsigned char *code, int code_length) {
   setbuf(stdout, NULL);
   int64_t *stack;
   /* Stackpointer zeigt immer auf die Speicherzelle in die als nächstes geschrieben werden kann */
@@ -38,6 +43,7 @@ int interpret(unsigned char *code) {
 
   int i = 0;
   int anzparam;
+
 
 
   unsigned char tempbyte;
@@ -76,15 +82,27 @@ int interpret(unsigned char *code) {
     &&op_return // 30
   };
 
+  /* vor der ausführung, den code (= command-ids) in adressen umwandeln */
+  debug_print("getting code section of size %d", code_length);
+  void **code_addresses = malloc(code_length * sizeof(void *));
+  if(code_addresses == NULL) {
+    printf("alloc code-section failed");
+    return 1;
+  }
+  for(int i=0;i<code_length;i++) {
+    // Übernehmen der Instruktionsadresse
+    code_addresses[i] = command_impl[code[i*COMMANDSIZE]];
+  }
+
   stack = (int64_t*)malloc(5000 * sizeof(int64_t));
   if(stack == NULL) {
     printf("alloc stack failed");
     return 1;
   }
 
-  int pc = 0 - COMMANDSIZE;
+  void **pc = code_addresses;
 
-  DISPATCH();
+  EXECUTE();
 
   op_invalid:
     debug_print("Invalid command 0");
@@ -177,14 +195,14 @@ int interpret(unsigned char *code) {
     /* Jump wenn wert am stackpointer == 0 */
     stackpointer--;
     if(stack[stackpointer] == 0) {
-      pc = pc + (COMMANDSIZE * ((int)P1()));
+      pc += ((int)P1());
       EXECUTE();
     } else {
       DISPATCH();
     }
   op_j:
     /* relative jump + P1() */
-    pc = pc + (COMMANDSIZE * ((int)P1()));
+    pc += ((int)P1());
     EXECUTE();
   op_alloc: RETURN(1);
   op_storei: RETURN(1);
@@ -207,12 +225,12 @@ int interpret(unsigned char *code) {
 		stack[stackpointer] = framepointer;
 		stackpointer++;
 		// SP steht jetzt auf zelle für oriip
-		stack[stackpointer] = pc + COMMANDSIZE; /* es wird +1 gerechnet, damit er beim return nur übernommen werden muss */
+		stack[stackpointer] = (int64_t)(pc + 1); /* es wird +1 gerechnet, damit er beim return nur übernommen werden muss */
 		stackpointer++;
     debug_print("calling function (retv: %d, ofp: %d, oip: %d)", (int)stack[stackpointer-3], (int)stack[stackpointer-2], (int)(stack[stackpointer-1]/17));
 
     stackpointer += anzparam;
-    pc = pc + (COMMANDSIZE * P1());
+    pc = (pc + P1());
     EXECUTE();
   op_funcentry:
     /* setzt nur noch den framepointer richtig */
@@ -231,7 +249,7 @@ int interpret(unsigned char *code) {
   	framepointer = stack[stackpointer]; /* wert nach retval = framePointer */
 
 
-    pc = stack[stackpointer+1];
+    pc = (void *)stack[stackpointer+1];
     debug_print("After return fp: %d, sp: %d", framepointer, stackpointer);
     EXECUTE();
   op_return:
@@ -276,7 +294,7 @@ int main(int argc, char* argv[])
       // Habe jetzt buffer
       // Literals wegspeichern
 
-      interpret(buffer_commands);
+      interpret(buffer_commands, (readsize*s) - 8 - litsize);
 
       free(buffer);
     }
