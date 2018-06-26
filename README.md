@@ -3,6 +3,8 @@ Comparison of stack and register implementations of interpreters for a subset of
 The interpreter were tested using predefined php-files (fib.php, prime.php...)
 
 ## prerequesites
+- go compiler
+- optional (for v3): gcc
 - goyacc (https://godoc.org/golang.org/x/tools/cmd/goyacc)
 - nex (http://www-cs-students.stanford.edu/∼blynn/nex/)
 - stringer (https://godoc.org/golang.org/x/tools/cmd/stringer)
