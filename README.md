@@ -1,6 +1,9 @@
 # PHP Interpreters written in GO (and C)
 Comparison of stack and register implementations of interpreters for a subset of PHP.
-The interpreter were tested using predefined php-files (fib.php, prime.php...)
+The interpreters were tested using predefined php-files (fib.php, prime.php...).
+There are 4 versions: 1 register-interpreter written in GO, 2 stack-interpreters written in GO, and
+1 stack interpreter written in C. An overview of the design choices (and errors) can be found in
+my [presentation](presentation.pdf).
 
 ## prerequesites
 - go compiler
@@ -25,4 +28,5 @@ Version 3: New stack interpreter - this time written in C using direct threaded 
 uses the same compiler and command-set as v2.
 
 ### benchmarks
-The results of the different benchmarks. A detailed (but not very well annotated) overview can be found in bm.ods.
+The results of the different benchmarks. A detailed (but not very well annotated) overview can be found in [bm.ods]bm.ods.
+Also contains the source files for the 3 benchmarks.
