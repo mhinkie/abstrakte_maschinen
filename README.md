@@ -19,7 +19,8 @@ Version 1 interpreters with ability to record command runtimes.
 Version 2: New stack interpreter (reduced command set - no block entries or exists) written in GO.
 
 ### v3
-Version 3: New stack interpreter - this time written in C using direct threaded code.
+Version 3: New stack interpreter - this time written in C using direct threaded code. This interpreter
+uses the same compiler and command-set as v2.
 
 ### benchmarks
 The results of the different benchmarks. A detailed (but not very well annotated) overview can be found in bm.ods.
