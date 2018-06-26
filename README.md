@@ -13,7 +13,7 @@ my [presentation](presentation.pdf).
 - stringer (https://godoc.org/golang.org/x/tools/cmd/stringer)
 
 ## Directories
-The versions directories (v1, v2, v3) each contain scripts to run the interpreter (including the compiler) - e.g.:
+The version-directories (v1, v2, v3) each contain scripts to run the interpreter (including the compiler) - e.g.:
 ```
 cd v1
 ./mphp_stack.sh ../benchmarks/fib.php
