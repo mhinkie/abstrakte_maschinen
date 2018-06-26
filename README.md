@@ -28,5 +28,5 @@ Version 3: New stack interpreter - this time written in C using direct threaded 
 uses the same compiler and command-set as v2.
 
 ### benchmarks
-The results of the different benchmarks. A detailed (but not very well annotated) overview can be found in [bm.ods]bm.ods.
+The results of the different benchmarks. A detailed (but not very well annotated) overview can be found in [bm.ods](bm.ods).
 Also contains the source files for the 3 benchmarks.
