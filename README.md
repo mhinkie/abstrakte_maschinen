@@ -13,6 +13,13 @@ my [presentation](presentation.pdf).
 - stringer (https://godoc.org/golang.org/x/tools/cmd/stringer)
 
 ## Directories
+The versions directories (v1, v2, v3) each contain scripts to run the interpreter (including the compiler) - e.g.:
+```
+cd v1
+./mphp_stack.sh ../benchmarks/fib.php
+```
+Note: The programs might have to be recompiled (depending on system). Run `make` in the respective
+`compiler_stack`/`compiler_reg` and `interpreter_stack`/`interpreter_reg` directories.
 
 ### v1
 Version 1 of stack and register interpreters (and compilers) written in GO.
